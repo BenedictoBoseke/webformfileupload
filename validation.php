@@ -16,14 +16,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         return;
     }
 
-    $uploadDir = "uploads/";
-    $uploadFile = $uploadDir . basename($file["name"]);
+    // Database connection details
+    $host = "localhost";
+    $username = "root";
+    $password = "";
+    $database = "test";
 
-    if (move_uploaded_file($file["tmp_name"], $uploadFile)) {
-        echo "File uploaded successfully.";
-        // Additional processing or database storage can be added here
+    // Create database connection
+    $conn = new mysqli($host, $username, $password, $database);
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+    // Prepared statement to insert data
+    $stmt = $conn->prepare("INSERT INTO uploads (email, filename) VALUES (?, ?)");
+    $stmt->bind_param("ss", $email, $fileName);
+
+    $fileName = basename($file["name"]);
+    if (move_uploaded_file($file["tmp_name"], "uploads/" . $fileName)) {
+        if ($stmt->execute()) {
+            echo "File uploaded and data stored successfully.";
+        } else {
+            echo "Error storing data.";
+        }
     } else {
         echo "Error uploading file.";
     }
+
+    // Close prepared statement and database connection
+    $stmt->close();
+    $conn->close();
 }
 ?>
