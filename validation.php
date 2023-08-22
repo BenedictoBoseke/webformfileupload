@@ -1,4 +1,11 @@
 <?php
+session_start();
+
+if ($_SESSION['user_role'] !== 'Admin') {
+    echo "You don't have permission to access this feature.";
+    return;
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST["email"];
 
@@ -16,19 +23,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         return;
     }
 
-    // Database connection details
     $host = "localhost";
     $username = "root";
     $password = "";
     $database = "test";
 
-    // Create database connection
     $conn = new mysqli($host, $username, $password, $database);
     if ($conn->connect_error) {
         die("Connection failed: " . $conn->connect_error);
     }
 
-    // Prepared statement to insert data
     $stmt = $conn->prepare("INSERT INTO uploads (email, filename) VALUES (?, ?)");
     $stmt->bind_param("ss", $email, $fileName);
 
@@ -43,7 +47,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "Error uploading file.";
     }
 
-    // Close prepared statement and database connection
     $stmt->close();
     $conn->close();
 }

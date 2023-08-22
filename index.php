@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>File Upload and Email Validation</title>
+    <title>Login</title>
 </head>
 <body>
-    <h1>Upload a File and Enter Email</h1>
-    <form action="validation.php" method="POST" enctype="multipart/form-data">
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required><br><br>
+    <h1>Login</h1>
+    <form action="authenticate.php" method="POST">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br><br>
         
-        <label for="file">File (JPEG/PNG only):</label>
-        <input type="file" id="file" name="file" accept=".jpeg, .jpg, .png" required><br><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br><br>
         
-        <input type="submit" value="Upload and Submit">
+        <input type="submit" value="Login">
     </form>
 </body>
 </html>
