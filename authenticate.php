@@ -15,6 +15,30 @@ if ($conn->connect_error) {
 $username = $_POST['username'];
 $password = $_POST['password'];
 
+// reCAPTCHA
+$recaptcha_secret = '6LcLlYcjAAAAAFIF9DMVdhXXQIh_kjpv605FygNf';
+$recaptcha_response = $_POST['g-recaptcha-response'];
+
+$verification_url = 'https://www.google.com/recaptcha/api/siteverify';
+$verification_data = array(
+    'secret' => $recaptcha_secret,
+    'response' => $recaptcha_response
+);
+
+$ch = curl_init($verification_url);
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($verification_data));
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+$response = curl_exec($ch);
+curl_close($ch);
+
+$result = json_decode($response);
+
+if (!$result->success) {
+    die("reCAPTCHA verification failed");
+}
+
 $stmt = $conn->prepare("SELECT user_id, password, role FROM users WHERE username = ?");
 $stmt->bind_param("s", $username);
 $stmt->execute();
