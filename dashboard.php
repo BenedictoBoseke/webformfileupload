@@ -1,8 +1,7 @@
 <?php
 session_start();
 
-// Check if the user is logged in and has the 'Admin' role
-if ($_SESSION['user_role'] === 'Admin') {
+if ($_SESSION['user_role'] === 'admin') {
     echo '
         <!DOCTYPE html>
         <html>

@@ -15,7 +15,7 @@ if ($conn->connect_error) {
 $username = $_POST['username'];
 $password = $_POST['password'];
 
-// reCAPTCHA
+// reCAPTCHA verification
 $recaptcha_secret = '6LcLlYcjAAAAAFIF9DMVdhXXQIh_kjpv605FygNf';
 $recaptcha_response = $_POST['g-recaptcha-response'];
 
@@ -39,19 +39,26 @@ if (!$result->success) {
     die("reCAPTCHA verification failed");
 }
 
-$stmt = $conn->prepare("SELECT user_id, password, role FROM users WHERE username = ?");
-$stmt->bind_param("s", $username);
-$stmt->execute();
-$result = $stmt->get_result();
-$row = $result->fetch_assoc();
+$userRole = 'admin'; // bisa diganti sesuai kebutuhan role.
+$resource = 'dashboard';
+$requiredPermission = 'edit';
 
-if (password_verify($password, $row['password'])) {
-    $_SESSION['user_role'] = $row['role'];
-    header("Location: dashboard.php");
-} else {
-    echo "Invalid username or password.";
+$roles = [
+    'admin' => ['create', 'edit', 'delete'],
+    'editor' => ['create', 'edit'],
+    'viewer' => ['view'],
+];
+
+function hasPermission($userRole, $requiredPermission, $roles) {
+    return isset($roles[$userRole]) && in_array($requiredPermission, $roles[$userRole]);
 }
 
-$stmt->close();
+if (hasPermission($userRole, $requiredPermission, $roles)) {
+    $_SESSION['user_role'] = $userRole;
+    header("Location: dashboard.php");
+} else {
+    echo "Insufficient permission to access the {$resource}.";
+}
+
 $conn->close();
 ?>
